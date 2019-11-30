@@ -1,7 +1,13 @@
 #!/usr/bin/env python3
 #!/usr/bin/python3 -W all
 
-# standar python
+"""
+
+See the README.md
+
+"""
+
+# standad python
 import configparser
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import os
