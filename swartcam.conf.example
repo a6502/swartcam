@@ -1,0 +1,3 @@
+[swartcam]
+# your youtube channel
+dest = rtmp://a.rtmp.youtube.com/live2/<key>
