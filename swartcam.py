@@ -26,9 +26,9 @@ camthread = None
 stream_cmd = None
 
 base_cmd = """exec ffmpeg -xerror \
--f h264 -r 15 -thread_queue_size 16 -i - \
--f alsa -thread_queue_size 16 -fflags nobuffer -itsoffset 5.5 -ac 1 -i hw:1,0 \
--vcodec copy -acodec aac -ac 1 -ab 32k -map 0:0 -map 1:0 -strict experimental -f flv \
+-f h264 -r 15 -thread_queue_size 512 -i - \
+-f alsa -thread_queue_size 512 -fflags nobuffer -itsoffset 5.5 -ac 1 -i plug:ladspa \
+-vcodec copy -acodec aac -ac 2 -ab 128k -ar 44100 -map 0:0 -map 1:0 -strict experimental -f flv \
 """
 
 class CamThread(threading.Thread):
@@ -45,7 +45,11 @@ class CamThread(threading.Thread):
     def run(self):
         print('starting camera')
         with PiCamera(resolution=(1280,720), framerate=15) as camera:
-            camera.awb_mode = 'fluorescent'
+            camera.awb_mode = 'incandescent' #'tungsten'
+            camera.brightness = 52
+            camera.drc_strength = 'high'
+            #camera.exposure_mode = 'spotlight'
+            camera.meter_mode = 'backlit'
             while True:
                 #self.preview.wait()
                 if self.preview.is_set() and not self.doing_preview:
