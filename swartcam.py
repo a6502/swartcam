@@ -50,6 +50,8 @@ class CamThread(threading.Thread):
             camera.drc_strength = 'high'
             #camera.exposure_mode = 'spotlight'
             camera.meter_mode = 'backlit'
+            camera.exposure_compensation = 1
+            camera.image_effect = 'denoise'
             while True:
                 #self.preview.wait()
                 if self.preview.is_set() and not self.doing_preview:
