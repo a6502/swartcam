@@ -26,7 +26,7 @@ camthread = None
 stream_cmd = None
 
 base_cmd = """exec ffmpeg -xerror \
--f h264 -r 15 -thread_queue_size 512 -i - \
+-f h264 -r 24 -thread_queue_size 512 -i - \
 -f alsa -thread_queue_size 512 -fflags nobuffer -itsoffset 5.5 -ac 1 -i plug:ladspa \
 -vcodec copy -acodec aac -ac 2 -ab 128k -ar 44100 -map 0:0 -map 1:0 -strict experimental -f flv \
 """
@@ -44,7 +44,7 @@ class CamThread(threading.Thread):
 
     def run(self):
         print('starting camera')
-        with PiCamera(resolution=(1280,720), framerate=15) as camera:
+        with PiCamera(resolution=(1280,720), framerate=24) as camera:
             camera.awb_mode = 'incandescent' #'tungsten'
             camera.brightness = 52
             camera.drc_strength = 'high'
@@ -81,8 +81,8 @@ class CamThread(threading.Thread):
             camera.start_recording(
                 ffmpeg.stdin,
                 format='h264',
-                quality=28,
-                bitrate=500000,
+                quality=25,
+                bitrate=2_000_000,
                 intra_period=75,
                 intra_refresh='adaptive',
                 sps_timing=True,
