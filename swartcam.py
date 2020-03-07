@@ -45,13 +45,14 @@ class CamThread(threading.Thread):
     def run(self):
         print('starting camera')
         with PiCamera(resolution=(1280,720), framerate=24) as camera:
+            camera.annotate_text_size = 20
             camera.awb_mode = 'incandescent' #'tungsten'
             camera.brightness = 52
             camera.drc_strength = 'high'
             #camera.exposure_mode = 'spotlight'
-            camera.meter_mode = 'backlit'
             camera.exposure_compensation = 1
             camera.image_effect = 'denoise'
+            camera.meter_mode = 'backlit'
             while True:
                 #self.preview.wait()
                 if self.preview.is_set() and not self.doing_preview:
@@ -82,7 +83,7 @@ class CamThread(threading.Thread):
                 ffmpeg.stdin,
                 format='h264',
                 quality=25,
-                bitrate=2_000_000,
+                bitrate=2_500_000,
                 intra_period=75,
                 intra_refresh='adaptive',
                 sps_timing=True,
@@ -90,7 +91,9 @@ class CamThread(threading.Thread):
             camera.request_key_frame()
 
             while self.streaming.is_set():
-                camera.annotate_text = strftime("%Y-%m-%d %H:%M:%S")
+                # hack to move annotation to the right
+                camera.annotate_text = strftime(
+                    "                                %Y-%m-%d %H:%M:%S")
                 camera.wait_recording(1)
             #print('stopping stream')
             #camera.stop_recording()
@@ -101,6 +104,7 @@ class CamThread(threading.Thread):
         finally:
             print('\nstopping stream\n')
             camera.stop_recording()
+            camera.annotate_text = ''
             ffmpeg.stdin.close()
             ffmpeg.terminate()
             sleep(1)
@@ -126,6 +130,21 @@ class StaticServer(BaseHTTPRequestHandler):
                   <head>
                     <meta charset="utf-8">
                     <title>SwartCamControl</title>
+                    <style>
+                      body {{
+                        font-size: 20pt;
+                      }}
+                      h1 {{
+                        font-size: 30pt
+                      }}
+                      .button {{
+                        font-size: 100%;
+                        min-height: 15mm;
+                        min-width: 25%;
+                        background-color: LightGrey;
+                        border-color: Black;
+                      }}
+                    </style>
                   </head>
                   <body>
                     <h1>SwartCamControl</h1>
@@ -133,8 +152,8 @@ class StaticServer(BaseHTTPRequestHandler):
                     <p>Streaming: {streaming_status}</p>
                     <div>
                       <form method="post" action="/">
-                        <input type="submit" {preview_button}>
-                        <input type="submit" {streaming_button}>
+                        <input class="button" type="submit" {preview_button}>
+                        <input class="button" type="submit" {streaming_button}>
                       </form>
                     </div>
                   </body>
