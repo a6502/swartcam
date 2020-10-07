@@ -47,12 +47,12 @@ class CamThread(threading.Thread):
         with PiCamera(resolution=(1280,720), framerate=24) as camera:
             camera.annotate_text_size = 20
             camera.awb_mode = 'incandescent' #'tungsten'
-            camera.brightness = 52
+            #camera.brightness = 52
             camera.drc_strength = 'high'
             #camera.exposure_mode = 'spotlight'
-            camera.exposure_compensation = 1
-            camera.image_effect = 'denoise'
-            camera.meter_mode = 'backlit'
+            #camera.exposure_compensation = 1
+            #camera.image_effect = 'denoise'
+            #camera.meter_mode = 'backlit'
             while True:
                 #self.preview.wait()
                 if self.preview.is_set() and not self.doing_preview:
@@ -81,11 +81,12 @@ class CamThread(threading.Thread):
                 shell=True)
             camera.start_recording(
                 ffmpeg.stdin,
+                bitrate=2_000_000,
                 format='h264',
-                quality=25,
-                bitrate=2_500_000,
                 intra_period=75,
                 intra_refresh='adaptive',
+                quality=25,
+                sei=True,
                 sps_timing=True,
             )
             camera.request_key_frame()
